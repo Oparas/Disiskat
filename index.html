@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>Nikonpantest - Update 6.74</title>
+  <title>OrangePost - Update 7.01</title>
   <style>
     body {
       margin: 0;
@@ -157,13 +157,14 @@
 <body>
 
   <header>
-    Nikonpantest — Update 6.74
+    OrangePost - Update 7.01
   </header>
 
   <div class="sidenav">
     <a href="#">🏠 หน้าแรก</a>
     <a href="#">👥 เพื่อน</a>
     <a href="#">📷 รูปภาพ</a>
+    <a href="#">📁 ไฟล์</a>
     <a href="#">⚙ การตั้งค่า</a>
   </div>
 
@@ -246,7 +247,52 @@
         textarea.value = "";
       }
     });
+    // โหลดโพสต์จาก localStorage
+window.onload = () => {
+  const savedPosts = JSON.parse(localStorage.getItem("posts")) || [];
+  savedPosts.forEach(html => {
+    const post = document.createElement("div");
+    post.className = "post";
+    post.innerHTML = html;
+    postsDiv.appendChild(post);
+  });
+};
+
+// เมื่อกดโพสต์
+button.addEventListener("click", () => {
+  const text = textarea.value.trim();
+  if (text !== "") {
+    const postHTML = `
+      <div class="post-header">
+        <img src="กท.png" class="avatar" alt="avatar">
+        <div>
+          <div class="post-author">คุณ</div>
+          <div class="post-date">${new Date().toLocaleString('th-TH')}</div>
+        </div>
+      </div>
+      <div class="post-content">${text}</div>
+      <div class="post-actions">
+        <span>👍 ถูกใจ</span>
+        <span>💬 แสดงความคิดเห็น</span>
+        <span>↪ แชร์</span>
+      </div>
+    `;
+    const post = document.createElement("div");
+    post.className = "post";
+    post.innerHTML = postHTML;
+    postsDiv.prepend(post);
+
+    // บันทึกลง localStorage
+    const saved = JSON.parse(localStorage.getItem("posts")) || [];
+    saved.unshift(postHTML);
+    localStorage.setItem("posts", JSON.stringify(saved));
+
+    textarea.value = "";
+  }
+});
+
   </script>
 
 </body>
 </html>
+
