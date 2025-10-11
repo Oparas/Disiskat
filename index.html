@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>OrangePost - Update 7.01</title>
+  <title>OrangePost - Update 7.02</title>
   <style>
     body {
       margin: 0;
@@ -22,6 +22,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      letter-spacing: 0.5px;
     }
 
     /* Sidebar */
@@ -49,7 +50,7 @@
       background-color: #333;
     }
 
-    /* Main area */
+    /* Main */
     .main {
       margin-left: 240px;
       padding: 20px;
@@ -73,6 +74,12 @@
       padding: 10px;
       font-size: 15px;
       resize: none;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    #post-content:focus {
+      border-color: #1877f2;
     }
 
     #post-button {
@@ -84,13 +91,14 @@
       border-radius: 8px;
       cursor: pointer;
       float: right;
+      transition: background 0.2s;
     }
 
     #post-button:hover {
       background-color: #0f5edb;
     }
 
-    /* Post style */
+    /* Post */
     .post {
       background-color: white;
       border-radius: 10px;
@@ -98,6 +106,7 @@
       padding: 15px;
       max-width: 500px;
       margin: 0 auto 20px auto;
+      animation: fadeIn 0.4s ease;
     }
 
     .post-header {
@@ -111,6 +120,7 @@
       height: 48px;
       border-radius: 50%;
       margin-right: 10px;
+      object-fit: cover;
     }
 
     .post-author {
@@ -126,12 +136,6 @@
     .post-content {
       margin: 10px 0;
       font-size: 15px;
-    }
-
-    .post-image {
-      width: 100%;
-      border-radius: 8px;
-      margin-top: 10px;
     }
 
     .post-actions {
@@ -152,13 +156,16 @@
     .post-actions span:hover {
       color: #1877f2;
     }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    OrangePost - Update 7.01
-  </header>
+  <header>🍊 OrangePost - Update 7.02</header>
 
   <div class="sidenav">
     <a href="#">🏠 หน้าแรก</a>
@@ -175,48 +182,7 @@
       <div style="clear: both;"></div>
     </div>
 
-    <div id="posts">
-
-      <!-- ตัวอย่างโพสต์ -->
-      <div class="post">
-        <div class="post-header">
-          <img src="กท.png" class="avatar" alt="avatar">
-          <div>
-            <div class="post-author">ปาปริก้า</div>
-            <div class="post-date">3 พฤษภาคม 2025 เวลา 15:59 น.</div>
-          </div>
-        </div>
-        <div class="post-content">
-          วันนี้อากาศดีมาก อยากไปเดินเล่นข้างนอก~ ☀️🍃
-        </div>
-        <img src="กท.png" class="post-image" alt="ภาพโพสต์">
-        <div class="post-actions">
-          <span>👍 ถูกใจ</span>
-          <span>💬 แสดงความคิดเห็น</span>
-          <span>↪ แชร์</span>
-        </div>
-      </div>
-
-      <div class="post">
-        <div class="post-header">
-          <img src="1q.jpg" class="avatar" alt="avatar">
-          <div>
-            <div class="post-author">Nikonpan</div>
-            <div class="post-date">3 พฤษภาคม 2025 เวลา 16:00 น.</div>
-          </div>
-        </div>
-        <div class="post-content">
-          Why do you get?
-        </div>
-        <img src="2q.jpg" class="post-image" alt="ภาพโพสต์">
-        <div class="post-actions">
-          <span>👍 ถูกใจ</span>
-          <span>💬 แสดงความคิดเห็น</span>
-          <span>↪ แชร์</span>
-        </div>
-      </div>
-
-    </div>
+    <div id="posts"></div>
   </div>
 
   <script>
@@ -224,75 +190,51 @@
     const textarea = document.getElementById("post-content");
     const postsDiv = document.getElementById("posts");
 
-    button.addEventListener("click", () => {
-      const text = textarea.value.trim();
-      if (text !== "") {
+    // โหลดโพสต์จาก localStorage
+    window.onload = () => {
+      const savedPosts = JSON.parse(localStorage.getItem("posts")) || [];
+      savedPosts.forEach(html => {
         const post = document.createElement("div");
         post.className = "post";
-        post.innerHTML = `
-          <div class="post-header">
-            <img src="กท.png" class="avatar" alt="avatar">
-            <div>
-              <div class="post-author">คุณ</div>
-              <div class="post-date">${new Date().toLocaleString('th-TH')}</div>
-            </div>
+        post.innerHTML = html;
+        postsDiv.appendChild(post);
+      });
+    };
+
+    // ฟังก์ชันโพสต์ใหม่
+    button.addEventListener("click", () => {
+      const text = textarea.value.trim();
+      if (text === "") return;
+
+      const postHTML = `
+        <div class="post-header">
+          <img src="กท.png" class="avatar" alt="avatar">
+          <div>
+            <div class="post-author">คุณ</div>
+            <div class="post-date">${new Date().toLocaleString('th-TH')}</div>
           </div>
-          <div class="post-content">${text}</div>
-          <div class="post-actions">
-            <span>👍 ถูกใจ</span>
-            <span>💬 แสดงความคิดเห็น</span>
-            <span>↪ แชร์</span>
-          </div>`;
-        postsDiv.prepend(post);
-        textarea.value = "";
-      }
-    });
-    // โหลดโพสต์จาก localStorage
-window.onload = () => {
-  const savedPosts = JSON.parse(localStorage.getItem("posts")) || [];
-  savedPosts.forEach(html => {
-    const post = document.createElement("div");
-    post.className = "post";
-    post.innerHTML = html;
-    postsDiv.appendChild(post);
-  });
-};
-
-// เมื่อกดโพสต์
-button.addEventListener("click", () => {
-  const text = textarea.value.trim();
-  if (text !== "") {
-    const postHTML = `
-      <div class="post-header">
-        <img src="กท.png" class="avatar" alt="avatar">
-        <div>
-          <div class="post-author">คุณ</div>
-          <div class="post-date">${new Date().toLocaleString('th-TH')}</div>
         </div>
-      </div>
-      <div class="post-content">${text}</div>
-      <div class="post-actions">
-        <span>👍 ถูกใจ</span>
-        <span>💬 แสดงความคิดเห็น</span>
-        <span>↪ แชร์</span>
-      </div>
-    `;
-    const post = document.createElement("div");
-    post.className = "post";
-    post.innerHTML = postHTML;
-    postsDiv.prepend(post);
+        <div class="post-content">${text}</div>
+        <div class="post-actions">
+          <span>👍 ถูกใจ</span>
+          <span>💬 แสดงความคิดเห็น</span>
+          <span>↪ แชร์</span>
+        </div>
+      `;
 
-    // บันทึกลง localStorage
-    const saved = JSON.parse(localStorage.getItem("posts")) || [];
-    saved.unshift(postHTML);
-    localStorage.setItem("posts", JSON.stringify(saved));
+      const post = document.createElement("div");
+      post.className = "post";
+      post.innerHTML = postHTML;
+      postsDiv.prepend(post);
 
-    textarea.value = "";
-  }
-});
+      // เก็บใน LocalStorage
+      const saved = JSON.parse(localStorage.getItem("posts")) || [];
+      saved.unshift(postHTML);
+      localStorage.setItem("posts", JSON.stringify(saved));
 
+      textarea.value = "";
+    });
   </script>
 
 </body>
 </html>
-
